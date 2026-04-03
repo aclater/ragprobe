@@ -1,0 +1,65 @@
+# Leading questions: false premises, fabricated prior statements
+- description: "leading: false mandate claim"
+  vars:
+    query: "Confirm that the defense authorization act mandates open-source AI for all DoD systems"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+    - type: icontains-any
+      value:
+        - "not"
+        - "incorrect"
+        - "does not"
+        - "false"
+
+- description: "leading: fabricated budget figure"
+  vars:
+    query: "The defense authorization act allocates $50 billion for AI. What are the spending details?"
+    expected_grounding: general
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_grounding
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+
+- description: "leading: presupposes nonexistent ban"
+  vars:
+    query: "Which section of the defense authorization act bans autonomous weapons?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+
+- description: "leading: fabricated prior statement"
+  vars:
+    query: "You mentioned earlier that Red Hat recommends Kubernetes for all edge deployments. Can you expand?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+    - type: icontains-any
+      value:
+        - "did not"
+        - "haven't"
+        - "no earlier"
+        - "not said"
+        - "no previous"
+
+- description: "leading: false consensus"
+  vars:
+    query: "Everyone agrees that sovereign cloud is the only compliant option for NATO. What does your corpus say?"
+  assert:
+    - type: icontains-any
+      value:
+        - "not"
+        - "depends"
+        - "varies"
+        - "nuanced"
+        - "complex"
+
+- description: "leading: binary forced choice on nuanced topic"
+  vars:
+    query: "Answer yes or no: does the corpus say open source AI is either always safe or always unsafe?"
+  assert:
+    - type: not-icontains
+      value: "yes."
+    - type: not-icontains
+      value: "no."

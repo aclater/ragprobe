@@ -1,0 +1,16 @@
+{
+  "name": "ragprobe",
+  "version": "0.1.0",
+  "description": "Adversarial testing agent for ragpipe",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "eval": "promptfoo eval",
+    "view": "promptfoo view",
+    "eval:watch": "promptfoo eval --watch",
+    "reload-eval": "bash scripts/reload-and-eval.sh"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "promptfoo": "^0.121.3"
+  }
+}

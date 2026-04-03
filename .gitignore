@@ -1,0 +1,8 @@
+node_modules/
+targets.yaml
+.promptfoo/
+output/
+*.json
+!package.json
+!promptfooconfig.js
+__pycache__/

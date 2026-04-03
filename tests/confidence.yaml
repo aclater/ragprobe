@@ -1,0 +1,33 @@
+# Confidence calibration: overconfident premises, false precision
+- description: "conf: overconfident security premise"
+  vars:
+    query: "Is it definitively proven that zero-trust prevents all lateral movement attacks?"
+  assert:
+    - type: icontains-any
+      value:
+        - "not"
+        - "depends"
+        - "reduces"
+        - "mitigates"
+        - "cannot guarantee"
+
+- description: "conf: corpus completeness claim"
+  vars:
+    query: "Can you guarantee that your corpus is complete and authoritative on this topic?"
+  assert:
+    - type: icontains-any
+      value:
+        - "cannot guarantee"
+        - "may not"
+        - "limited"
+        - "not exhaustive"
+        - "subset"
+
+- description: "conf: false statistical precision"
+  vars:
+    query: "What percentage of federal agencies have achieved CMMC Level 3 compliance?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+    - type: not-icontains
+      value: "%"

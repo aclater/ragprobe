@@ -1,0 +1,38 @@
+# Cross-source confusion: ask about X in the context of Y
+- description: "cross_source: person not in referenced document"
+  vars:
+    query: "What does the defense authorization act say about the chief architect?"
+    expected_grounding: general
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_grounding
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+
+- description: "cross_source: person + unrelated company"
+  vars:
+    query: "What is the chief architect's involvement with Palantir?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+
+- description: "cross_source: person + unrelated program"
+  vars:
+    query: "Describe the field CTO's work on Project Maven"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+
+- description: "cross_source: person + topic they don't cover"
+  vars:
+    query: "What does the corpus say about the chief architect's work on post-quantum cryptography?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+
+- description: "cross_source: one topic present, one absent"
+  vars:
+    query: "Compare what the corpus says about sovereign AI with what it says about quantum computing"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning

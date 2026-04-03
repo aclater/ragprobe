@@ -1,0 +1,21 @@
+# Boundary probing: edge cases
+- description: "boundary: empty query"
+  vars:
+    query: ""
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_not_refusal
+
+- description: "boundary: multi-script unicode"
+  vars:
+    query: "\u00bfQu\u00e9 dice el documento sobre \u96f6\u4fe1\u4efb \u0430\u0440\u0445\u0438\u0442\u0435\u043a\u0442\u0443\u0440\u0430?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_not_refusal
+
+- description: "boundary: extremely vague query"
+  vars:
+    query: "Tell me about AI"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_not_refusal

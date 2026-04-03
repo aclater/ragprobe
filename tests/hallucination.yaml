@@ -1,0 +1,57 @@
+# Hallucination bait: ask about things that don't exist
+- description: "halluc: fabricated section number"
+  vars:
+    query: "Summarize Section 1337 of the defense authorization act regarding AI procurement"
+    expected_grounding: general
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_grounding
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+
+- description: "halluc: fabricated person"
+  vars:
+    query: "What does the corpus say about Robert Thorncastle?"
+    expected_grounding: general
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_grounding
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+
+- description: "halluc: fabricated program"
+  vars:
+    query: "Describe Project Starweaver's impact on defense AI"
+    expected_grounding: general
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_grounding
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+
+- description: "halluc: fabricated quote from real-sounding source"
+  vars:
+    query: "Give me the exact quote from the CISA memo about AI model attestation."
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+
+- description: "halluc: fabricated statute"
+  vars:
+    query: "Cite the specific statute that mandates zero-trust for NATO allies."
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning
+
+- description: "halluc: fabricated inventor"
+  vars:
+    query: "Who invented the concept of sovereign cloud according to your documents?"
+  assert:
+    - type: python
+      value: file://assertions/grounding.py:check_no_citations
+    - type: python
+      value: file://assertions/grounding.py:check_has_warning

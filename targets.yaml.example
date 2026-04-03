@@ -1,0 +1,7 @@
+# ragprobe targets — copy to targets.yaml and fill in real values
+# Add as many targets as needed — the comparison matrix grows automatically
+targets:
+  - label: local
+    url: http://localhost:8090
+    token: your-admin-token
+    model: qwen3.5
