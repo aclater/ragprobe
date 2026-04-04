@@ -5,3 +5,11 @@ targets:
     url: http://localhost:8090
     token: your-admin-token
     model: qwen3.5
+
+# Agent config — used by agent.py for the tuning loop
+agent:
+  brain_url: http://localhost:8080   # LLM for prompt analysis (NOT through ragpipe)
+  brain_model: qwen3-coder           # model name for the brain
+  max_iterations: 5                  # max tuning iterations
+  target_pass_rate: 0.85             # stop when this pass rate is reached
+  prompt_file: prompts/system-prompt.txt  # file to write improved prompts to
