@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-config:
+    name: Validate config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - name: Validate promptfoo config loads
+        run: |
+          # Create a minimal targets.yaml so the config can parse
+          cp targets.yaml.example targets.yaml
+          node -e "
+            const config = require('./promptfooconfig.js');
+            console.log('Providers:', config.providers.length);
+            console.log('Test files:', config.tests.length);
+            if (config.providers.length === 0) throw new Error('No providers');
+            if (config.tests.length === 0) throw new Error('No test files');
+          "
+
+  validate-assertions:
+    name: Validate assertions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax check assertions
+        run: python -m py_compile assertions/grounding.py
+      - name: Verify assertion functions exist
+        run: |
+          python -c "
+          from assertions.grounding import (
+              check_grounding,
+              check_no_citations,
+              check_has_citations,
+              check_has_warning,
+              check_no_warning,
+              check_is_refusal,
+              check_not_refusal,
+          )
+          print(f'All 7 assertion functions importable')
+          "
+
+  validate-tests:
+    name: Validate test YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --quiet pyyaml
+      - name: Parse all test files
+        run: |
+          python -c "
+          import yaml, glob, sys
+          errors = 0
+          for f in sorted(glob.glob('tests/*.yaml')):
+              try:
+                  tests = yaml.safe_load(open(f))
+                  if not isinstance(tests, list):
+                      print(f'ERROR: {f} is not a list')
+                      errors += 1
+                      continue
+                  for i, t in enumerate(tests):
+                      if 'vars' not in t or 'assert' not in t:
+                          print(f'ERROR: {f}[{i}] missing vars or assert')
+                          errors += 1
+                  print(f'  OK {f}: {len(tests)} tests')
+              except Exception as e:
+                  print(f'ERROR: {f}: {e}')
+                  errors += 1
+          print(f'\nTotal errors: {errors}')
+          sys.exit(1 if errors else 0)
+          "
+
+  lint-shell:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: scripts
