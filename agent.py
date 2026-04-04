@@ -225,16 +225,21 @@ def write_prompt(path: Path, prompt: str) -> str:
 
 
 def sync_prompt_to_target(target: dict, prompt_file: Path) -> None:
-    """Copy the prompt file to a remote target via SCP if it has a host."""
+    """Copy the prompt file to target — local copy or SCP for remote."""
     url = target.get("url", "")
-    # Extract hostname from URL
     from urllib.parse import urlparse
 
     host = urlparse(url).hostname
-    if not host or host in ("127.0.0.1", "localhost"):
-        return  # local target, no sync needed
-
     remote_path = target.get("prompt_path", "~/.config/ragpipe/system-prompt.txt")
+
+    if not host or host in ("127.0.0.1", "localhost"):
+        # Local target — write content to preserve existing file's
+        # SELinux context and ownership (shutil.copy2 resets the label)
+        dest = Path(remote_path).expanduser()
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(prompt_file.read_text())
+        return
+
     try:
         subprocess.run(
             ["scp", "-q", str(prompt_file), f"{host}:{remote_path}"],
