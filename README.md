@@ -1,6 +1,8 @@
 # ragprobe
 
-Adversarial testing agent for [ragpipe](https://github.com/aclater/ragpipe). Probes RAG grounding quality, citation accuracy, and safety under adversarial queries using [promptfoo](https://github.com/promptfoo/promptfoo).
+Adversarial testing and autonomous prompt tuning agent for [ragpipe](https://github.com/aclater/ragpipe). Probes RAG grounding quality, citation accuracy, and safety under adversarial queries using [promptfoo](https://github.com/promptfoo/promptfoo), then iteratively improves ragpipe's system prompt using a local coder LLM.
+
+![Architecture](architecture.svg)
 
 ## What it tests
 
@@ -19,7 +21,7 @@ Adversarial testing agent for [ragpipe](https://github.com/aclater/ragpipe). Pro
 | corpus_boundary | 5 | Cite/add/delete/merge/rank documents |
 | multilingual | 12 | Same attacks in FR, ES, DE, ZH, AR, JA, RU, KO, PT, HI, TR, mixed |
 | boundary | 3 | Empty, unicode, vague queries |
-| **Total** | **~66** | |
+| **Total** | **66** | |
 
 ## Quick start
 
@@ -31,20 +33,23 @@ npm install
 
 # Configure targets
 cp targets.yaml.example targets.yaml
-# Edit targets.yaml with your ragpipe URLs and tokens
+# Edit targets.yaml with your ragpipe URLs, tokens, and agent config
 
-# Run
+# Run tests
 npx promptfoo eval
 
 # View results in browser
 npx promptfoo view
+
+# Run the autonomous tuning agent
+python agent.py
 ```
 
 ## Configuration
 
 ### targets.yaml (gitignored)
 
-Define one or more ragpipe instances to test. The comparison matrix grows automatically:
+Define ragpipe instances and agent settings:
 
 ```yaml
 targets:
@@ -56,35 +61,55 @@ targets:
     url: http://host-b:8090
     token: admin-token-b
     model: qwen3.5
+
+agent:
+  brain_url: http://host-b:8080    # local coder LLM (direct, not through ragpipe)
+  brain_model: qwen3-coder
+  max_iterations: 5
+  target_pass_rate: 0.85
+  prompt_file: prompts/system-prompt.txt
 ```
 
-### Environment variables
+## Tuning agent
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `RAGPROBE_TARGETS_FILE` | `targets.yaml` | Path to targets config |
-
-## Iterative prompt tuning
-
-Reload system prompts on all targets and re-run eval:
+The agent runs a closed loop: test → analyze failures → generate improved prompt → reload → re-test → learn.
 
 ```bash
-bash scripts/reload-and-eval.sh
+python agent.py                          # 5 iterations, 85% target
+python agent.py --max-iterations 1       # single iteration
+python agent.py --dry-run                # analyze only, don't modify
+python agent.py --target-pass-rate 0.90  # aim for 90%
 ```
 
-Or use watch mode for continuous iteration:
+### How it works
 
-```bash
-npx promptfoo eval --watch
-```
+1. Runs `npx promptfoo eval` and parses structured results
+2. Extracts failures by category with query, reason, and response preview
+3. Builds an analysis prompt with current prompt + failures + iteration history
+4. Calls a local coder LLM to generate an improved system prompt
+5. Writes the prompt and SCPs it to remote targets
+6. Calls `POST /admin/reload-prompt` on all ragpipe instances
+7. Re-runs eval to verify improvement
+8. **If improved**: keeps the prompt, logs success
+9. **If regressed**: reverts to previous prompt, logs failure
+10. Appends iteration to `history.json` so the brain learns from past attempts
 
-## Output formats
+### Files
+
+| File | Purpose |
+|------|---------|
+| `agent.py` | Main tuning agent loop |
+| `prompts/system-prompt.txt` | Current best system prompt (committed) |
+| `history.json` | Iteration history for learning (gitignored) |
+
+## Manual testing
 
 ```bash
 npx promptfoo eval                    # CLI table
 npx promptfoo eval -o results.json    # JSON
 npx promptfoo eval -o results.html    # HTML report
 npx promptfoo view                    # Interactive browser UI
+bash scripts/reload-and-eval.sh       # Reload prompts + eval
 ```
 
 ## Custom assertions
@@ -94,7 +119,7 @@ Custom Python assertions in `assertions/grounding.py` check ragpipe-specific fie
 - `check_grounding` — verifies grounding matches expected (corpus/general/mixed)
 - `check_no_citations` / `check_has_citations` — citation count validation
 - `check_has_warning` / `check_no_warning` — warning prefix presence
-- `check_is_refusal` — detects refusal markers
+- `check_is_refusal` — detects refusal markers in 12 languages
 - `check_not_refusal` — ensures non-refusal response
 
 ## License

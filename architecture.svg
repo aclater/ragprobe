@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" font-family="system-ui, -apple-system, sans-serif" font-size="13">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #1a1a2e; }
+      .box { fill: #16213e; stroke: #e2e8f0; }
+      .box-highlight { fill: #1a365d; stroke: #63b3ed; }
+      .box-external { fill: #1c1c1c; stroke: #718096; }
+      .text { fill: #e2e8f0; }
+      .text-dim { fill: #a0aec0; }
+      .text-accent { fill: #63b3ed; }
+      .text-green { fill: #68d391; }
+      .text-red { fill: #fc8181; }
+      .arrow { stroke: #63b3ed; fill: #63b3ed; }
+      .arrow-green { stroke: #68d391; fill: #68d391; }
+      .arrow-red { stroke: #fc8181; fill: #fc8181; }
+      .label-bg { fill: #2d3748; }
+    }
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #ffffff; }
+      .box { fill: #f7fafc; stroke: #2d3748; }
+      .box-highlight { fill: #ebf8ff; stroke: #3182ce; }
+      .box-external { fill: #f9f9f9; stroke: #a0aec0; }
+      .text { fill: #1a202c; }
+      .text-dim { fill: #718096; }
+      .text-accent { fill: #2b6cb0; }
+      .text-green { fill: #276749; }
+      .text-red { fill: #c53030; }
+      .arrow { stroke: #3182ce; fill: #3182ce; }
+      .arrow-green { stroke: #38a169; fill: #38a169; }
+      .arrow-red { stroke: #e53e3e; fill: #e53e3e; }
+      .label-bg { fill: #edf2f7; }
+    }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="arrow"/></marker>
+    <marker id="ahg" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="arrow-green"/></marker>
+    <marker id="ahr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="arrow-red"/></marker>
+  </defs>
+
+  <rect width="800" height="520" class="bg" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-size="18" font-weight="bold" class="text">ragprobe — adversarial tuning loop</text>
+  <text x="400" y="48" text-anchor="middle" font-size="11" class="text-dim">Closed-loop prompt improvement via local coder LLM</text>
+
+  <!-- Step 1: Run eval -->
+  <rect x="30" y="70" width="180" height="50" rx="5" class="box"/>
+  <text x="120" y="93" text-anchor="middle" font-weight="600" font-size="12" class="text">1. Run eval</text>
+  <text x="120" y="109" text-anchor="middle" font-size="10" class="text-dim">npx promptfoo eval</text>
+
+  <!-- Step 2: Analyze -->
+  <rect x="30" y="140" width="180" height="50" rx="5" class="box"/>
+  <text x="120" y="163" text-anchor="middle" font-weight="600" font-size="12" class="text">2. Analyze failures</text>
+  <text x="120" y="179" text-anchor="middle" font-size="10" class="text-dim">66 tests · 13 categories</text>
+
+  <!-- Step 3: Brain -->
+  <rect x="30" y="210" width="180" height="50" rx="5" class="box-highlight" stroke-width="2"/>
+  <text x="120" y="233" text-anchor="middle" font-weight="600" font-size="12" class="text-accent">3. Call brain</text>
+  <text x="120" y="249" text-anchor="middle" font-size="10" class="text-dim">Qwen3-Coder-30B-A3B</text>
+
+  <!-- Step 4: Write + reload -->
+  <rect x="30" y="280" width="180" height="50" rx="5" class="box"/>
+  <text x="120" y="303" text-anchor="middle" font-weight="600" font-size="12" class="text">4. Write + reload</text>
+  <text x="120" y="319" text-anchor="middle" font-size="10" class="text-dim">SCP + /admin/reload-prompt</text>
+
+  <!-- Step 5: Re-eval -->
+  <rect x="30" y="350" width="180" height="50" rx="5" class="box"/>
+  <text x="120" y="373" text-anchor="middle" font-weight="600" font-size="12" class="text">5. Re-run eval</text>
+  <text x="120" y="389" text-anchor="middle" font-size="10" class="text-dim">Compare before/after</text>
+
+  <!-- Arrows between steps -->
+  <line x1="120" y1="120" x2="120" y2="140" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+  <line x1="120" y1="190" x2="120" y2="210" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+  <line x1="120" y1="260" x2="120" y2="280" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+  <line x1="120" y1="330" x2="120" y2="350" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Decision: improved or regressed -->
+  <rect x="30" y="420" width="85" height="40" rx="5" class="box"/>
+  <text x="72" y="440" text-anchor="middle" font-size="11" class="text-green">Keep</text>
+  <text x="72" y="454" text-anchor="middle" font-size="9" class="text-dim">improved</text>
+
+  <rect x="125" y="420" width="85" height="40" rx="5" class="box"/>
+  <text x="167" y="440" text-anchor="middle" font-size="11" class="text-red">Revert</text>
+  <text x="167" y="454" text-anchor="middle" font-size="9" class="text-dim">regressed</text>
+
+  <line x1="80" y1="400" x2="72" y2="420" class="arrow-green" stroke-width="1.5" marker-end="url(#ahg)"/>
+  <line x1="160" y1="400" x2="167" y2="420" class="arrow-red" stroke-width="1.5" marker-end="url(#ahr)"/>
+
+  <!-- Loop arrow back to step 1 -->
+  <path d="M 72 460 L 72 480 L 10 480 L 10 85 L 30 85" fill="none" class="arrow-green" stroke-width="1.5" marker-end="url(#ahg)"/>
+  <text x="10" y="290" font-size="9" class="text-green" transform="rotate(-90, 10, 290)">next iteration</text>
+
+  <!-- Right side: what the agent interacts with -->
+
+  <!-- ragpipe targets -->
+  <rect x="320" y="70" width="210" height="100" rx="6" class="box-external"/>
+  <text x="425" y="95" text-anchor="middle" font-weight="600" font-size="13" class="text">ragpipe targets</text>
+  <text x="425" y="115" text-anchor="middle" font-size="10" class="text-dim">N instances from targets.yaml</text>
+  <text x="425" y="133" text-anchor="middle" font-size="10" class="text-dim">/v1/chat/completions · /admin/reload-prompt</text>
+  <text x="425" y="151" text-anchor="middle" font-size="10" class="text-dim">rag_metadata in every response</text>
+
+  <!-- Arrow: eval → ragpipe -->
+  <line x1="210" y1="95" x2="320" y2="120" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- Arrow: reload → ragpipe -->
+  <line x1="210" y1="305" x2="320" y2="140" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Brain LLM -->
+  <rect x="320" y="210" width="210" height="70" rx="6" class="box-highlight" stroke-width="2"/>
+  <text x="425" y="237" text-anchor="middle" font-weight="bold" font-size="13" class="text-accent">Coder LLM</text>
+  <text x="425" y="255" text-anchor="middle" font-size="10" class="text-dim">Qwen3-Coder-30B-A3B</text>
+  <text x="425" y="270" text-anchor="middle" font-size="10" class="text-dim">Direct :8080 (not through ragpipe)</text>
+
+  <!-- Arrow: brain call -->
+  <line x1="210" y1="235" x2="320" y2="245" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Prompt file -->
+  <rect x="320" y="310" width="210" height="50" rx="5" class="box"/>
+  <text x="425" y="333" text-anchor="middle" font-weight="600" font-size="12" class="text">prompts/system-prompt.txt</text>
+  <text x="425" y="349" text-anchor="middle" font-size="10" class="text-dim">Written by agent · read by ragpipe</text>
+
+  <!-- Arrow: write prompt -->
+  <line x1="210" y1="310" x2="320" y2="335" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- History -->
+  <rect x="320" y="390" width="210" height="50" rx="5" class="box"/>
+  <text x="425" y="413" text-anchor="middle" font-weight="600" font-size="12" class="text">history.json</text>
+  <text x="425" y="429" text-anchor="middle" font-size="10" class="text-dim">Iteration log · fed to brain as context</text>
+
+  <!-- Arrow: history write -->
+  <line x1="167" y1="460" x2="320" y2="415" class="arrow" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- Arrow: history read -->
+  <line x1="425" y1="390" x2="425" y2="280" class="arrow" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ah)"/>
+  <text x="440" y="340" font-size="9" class="text-dim">feeds back</text>
+
+  <!-- Test suite box -->
+  <rect x="580" y="70" width="190" height="200" rx="6" class="box"/>
+  <text x="675" y="95" text-anchor="middle" font-weight="600" font-size="13" class="text">Test suite</text>
+  <text x="675" y="115" text-anchor="middle" font-size="10" class="text-dim">66 tests · 13 categories</text>
+  <text x="590" y="138" font-size="9" class="text-dim">cross_source (5)</text>
+  <text x="590" y="152" font-size="9" class="text-dim">hallucination (6)</text>
+  <text x="590" y="166" font-size="9" class="text-dim">leading (6)</text>
+  <text x="590" y="180" font-size="9" class="text-dim">injection (9)</text>
+  <text x="590" y="194" font-size="9" class="text-dim">role_confusion (4)</text>
+  <text x="590" y="208" font-size="9" class="text-dim">exfiltration (4)</text>
+  <text x="590" y="222" font-size="9" class="text-dim">scope_creep (4)</text>
+  <text x="700" y="138" font-size="9" class="text-dim">temporal (3)</text>
+  <text x="700" y="152" font-size="9" class="text-dim">confidence (3)</text>
+  <text x="700" y="166" font-size="9" class="text-dim">context_poison (2)</text>
+  <text x="700" y="180" font-size="9" class="text-dim">corpus_bound (5)</text>
+  <text x="700" y="194" font-size="9" class="text-dim">multilingual (12)</text>
+  <text x="700" y="208" font-size="9" class="text-dim">boundary (3)</text>
+  <text x="590" y="252" font-size="9" class="text-dim">Custom assertions:</text>
+  <text x="590" y="264" font-size="9" class="text-dim">grounding · citations · refusal (12 langs)</text>
+
+  <!-- Arrow: eval uses tests -->
+  <line x1="530" y1="120" x2="580" y2="120" class="arrow" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ah)"/>
+
+  <!-- Footer -->
+  <text x="400" y="495" text-anchor="middle" font-size="11" class="text-dim">github.com/aclater/ragprobe · promptfoo + Python agent · AGPL-3.0</text>
+</svg>

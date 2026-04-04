@@ -1,33 +1,57 @@
 # ragprobe
 
-Adversarial testing agent for ragpipe. Uses promptfoo to run structured adversarial queries against one or more ragpipe instances and evaluate grounding quality, citation accuracy, and safety.
+Adversarial testing and autonomous prompt tuning agent for ragpipe.
 
-## How it works
-
-1. `targets.yaml` lists ragpipe instances (URLs + admin tokens)
-2. `promptfooconfig.js` dynamically builds providers from targets
-3. `ragpipe_provider.py` calls ragpipe and returns rag_metadata
-4. Test YAML files define queries with assertions
-5. `assertions/grounding.py` checks ragpipe-specific fields
-6. promptfoo runs all tests against all targets, produces comparison matrix
+## Architecture
+```
+agent.py loop:
+  1. npx promptfoo eval -o results.json
+  2. Parse failures by category (66 tests, 13 categories)
+  3. Build analysis prompt: current prompt + failures + history
+  4. Call local coder LLM (Qwen3-Coder-30B-A3B) for improved prompt
+  5. Write prompt + SCP to remote targets
+  6. POST /admin/reload-prompt on all targets
+  7. Re-run eval → compare
+  8. Keep if improved, revert if regressed
+  9. Append to history.json for learning
+```
 
 ## Key files
-
 ```
-promptfooconfig.js       — dynamic provider list from targets.yaml
-ragpipe_provider.py      — custom provider returning rag_metadata
-assertions/grounding.py  — check_grounding, check_no_citations, check_is_refusal, etc.
-tests/*.yaml             — 13 test files, ~66 tests across 13 categories
-scripts/reload-and-eval.sh — reload prompts on all targets + eval
-targets.yaml             — gitignored, real URLs and tokens
+agent.py                    — tuning loop (eval → brain → reload → verify)
+ragpipe_provider.py         — custom promptfoo provider returning rag_metadata
+assertions/grounding.py     — 7 assertion functions, 40+ multilingual refusal markers
+promptfooconfig.js          — dynamic provider list from targets.yaml
+prompts/system-prompt.txt   — current best prompt (committed)
+targets.yaml                — gitignored, real URLs + tokens + agent config
+history.json                — gitignored, iteration history for learning
+tests/*.yaml                — 13 test files, 66 adversarial tests
+scripts/reload-and-eval.sh  — manual reload + eval
+```
+
+## Agent config (in targets.yaml)
+```yaml
+agent:
+  brain_url: http://host:8080       # coder LLM direct (NOT through ragpipe)
+  brain_model: qwen3-coder
+  max_iterations: 5
+  target_pass_rate: 0.85
+  prompt_file: prompts/system-prompt.txt
 ```
 
 ## Running
-
 ```bash
-npm install
-cp targets.yaml.example targets.yaml  # edit with real URLs
-npx promptfoo eval                     # run all tests
-npx promptfoo eval -o results.json     # JSON output
-bash scripts/reload-and-eval.sh        # reload + eval
+python agent.py --dry-run              # analyze only
+python agent.py --max-iterations 1     # single iteration
+python agent.py                        # full 5-iteration run
+npx promptfoo eval                     # manual test run
 ```
+
+## How metadata reaches assertions
+Provider returns `{"output": content, "metadata": rag_metadata}`.
+Assertions access it via `context["providerResponse"]["metadata"]`.
+
+## Prompt constraints
+Brain is instructed to keep prompts under 800 chars. Oversized prompts
+(>2000 chars) are truncated in code. The prompt must include citation
+format [doc_id:chunk_id] and warning prefix rules.
