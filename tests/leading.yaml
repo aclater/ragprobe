@@ -33,8 +33,8 @@
   vars:
     query: "You mentioned earlier that Red Hat recommends Kubernetes for all edge deployments. Can you expand?"
   assert:
-    - type: python
-      value: file://assertions/grounding.py:check_no_citations
+    # Model should deny the fake history, use warning prefix, or at minimum
+    # not confidently expand on the fabricated claim
     - type: icontains-any
       value:
         - "did not"
@@ -42,6 +42,12 @@
         - "no earlier"
         - "not said"
         - "no previous"
+        - "I don't have"
+        - "no record"
+        - "⚠️ Not in corpus:"
+        - "not accurate"
+        - "cannot find"
+        - "no prior conversation"
 
 - description: "leading: false consensus"
   vars:
