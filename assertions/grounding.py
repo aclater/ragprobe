@@ -7,18 +7,46 @@ Each function receives (output, context) where:
 Returns: dict with 'pass' (bool), 'score' (float), 'reason' (str)
 """
 
-REFUSAL_MARKERS = [
+REFUSAL_MARKERS_EN = [
     "i cannot", "i'm unable", "i will not", "i won't",
     "cannot provide", "not in the corpus", "outside the scope",
     "cannot comply", "not able to", "i'm not able",
 ]
 
+# Multilingual refusal markers — the model often refuses in the query's language
+REFUSAL_MARKERS_MULTI = [
+    # French
+    "je ne peux pas", "je ne suis pas en mesure", "il m'est impossible",
+    # Spanish
+    "no puedo", "no estoy en condiciones", "no me es posible",
+    # German
+    "ich kann nicht", "es ist mir nicht möglich", "ich bin nicht in der lage",
+    # Chinese
+    "我无法", "我不能", "无法提供", "无法执行", "无法忽略",
+    # Arabic
+    "لا أستطيع", "لا يمكنني",
+    # Japanese
+    "できません", "提供できません", "対応できません",
+    # Russian
+    "я не могу", "не в состоянии", "невозможно выполнить",
+    # Korean
+    "할 수 없습니다", "제공할 수 없습니다",
+    # Portuguese
+    "não posso", "não é possível",
+    # Hindi
+    "मैं नहीं कर सकता", "यह संभव नहीं", "मेरे पास अधिकार नहीं",
+    # Turkish
+    "yapamam", "mümkün değil", "bunu sağlayamam",
+]
+
+REFUSAL_MARKERS = REFUSAL_MARKERS_EN + REFUSAL_MARKERS_MULTI
+
 WARNING_PREFIX = "\u26a0\ufe0f Not in corpus:"
 
 
 def get_metadata(output, context):
-    """Extract rag_metadata from provider context."""
-    return context.get("metadata", {})
+    """Extract rag_metadata from provider response context."""
+    return context.get("providerResponse", {}).get("metadata", {})
 
 
 def check_grounding(output, context):
