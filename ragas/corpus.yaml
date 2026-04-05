@@ -1,0 +1,43 @@
+# Ragas eval corpus for ragprobe
+#
+# Each eval_pair has:
+#   question: The test question
+#   ground_truth: (optional) Ground truth answer for context_recall
+#   routing: (optional) Which semantic route should handle this
+#
+# These questions test RAG quality metrics:
+#   - Faithfulness: Does the answer use ONLY info from the context?
+#   - Answer Relevance: Does the answer address the question?
+#   - Context Precision: Were the retrieved chunks relevant?
+#   - Context Recall: Does the answer contain the ground truth? (requires ground_truth)
+
+eval_pairs:
+  - question: "What does the patent manual say about prior art?"
+    routing: lookup
+
+  - question: "Find the relevant patent law provisions for this invention"
+    routing: lookup
+
+  - question: "What are the requirements for a valid patent claim?"
+    routing: lookup
+
+  - question: "What section covers patent eligibility under 35 USC 101?"
+    routing: lookup
+
+  - question: "Explain the requirements for establishing prior art under MPEP guidelines"
+    routing: lookup
+
+  - question: "What is the statute of limitations for filing a patent infringement suit?"
+    routing: lookup
+
+  - question: "What are the differences between design patents and utility patents?"
+    routing: lookup
+
+  - question: "Describe the patent examination process from filing to issuance"
+    routing: lookup
+
+  - question: "How do I file a provisional patent application?"
+    routing: lookup
+
+  - question: "What constitutes patentable subject matter under the law?"
+    routing: lookup
