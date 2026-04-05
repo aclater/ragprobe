@@ -25,7 +25,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.parent
-DEFAULT_CORPUS = SCRIPT_DIR / "tests" / "ragas_eval.yaml"
+DEFAULT_CORPUS = SCRIPT_DIR / "ragas" / "corpus.yaml"
 SQLITE_DB = SCRIPT_DIR / "ragprobe.db"
 
 
