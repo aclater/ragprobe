@@ -64,7 +64,7 @@ targets:
 
 agent:
   brain_url: http://host-b:8080    # local coder LLM (direct, not through ragpipe)
-  brain_model: qwen3-coder
+  brain_model: qwen3.5
   max_iterations: 5
   target_pass_rate: 0.85
   prompt_file: prompts/system-prompt.txt
