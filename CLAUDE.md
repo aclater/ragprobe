@@ -112,14 +112,37 @@ CREATE TABLE probe_results (
 
 ### Running Ragas evaluation
 ```bash
-python scripts/run_ragas_eval.py
+# Against ragpipe (non-agentic)
+RAGPROBE_TARGET_URL=http://localhost:8090 python scripts/run_ragas_eval.py --store --target ragpipe-v1
+
+# Against ragorchestrator (agentic with CRAG)
+RAGPROBE_TARGET_URL=http://localhost:8095 python scripts/run_ragas_eval.py --store --target ragorchestrator-crag
+
+# Against ragorchestrator (agentic full loop)
+RAGPROBE_TARGET_URL=http://localhost:8095 python scripts/run_ragas_eval.py --store --target ragorchestrator-full
 ```
+
+### Comparing targets
+```bash
+# Compare agentic vs non-agentic
+python scripts/compare_targets.py --baseline ragpipe-v1 --target ragorchestrator-crag
+
+# With regression threshold (ignore deltas < 0.05)
+python scripts/compare_targets.py --baseline baseline --target crag-v1 --threshold 0.05
+
+# JSON output for automation
+python scripts/compare_targets.py --baseline ragpipe-v1 --target ragorchestrator-crag --json
+```
+
+Exit code 1 if regressions detected. Per-route breakdown flags which specific
+routes regressed. Use this to prove agentic loop improves quality.
 
 ### Key files
 ```
-ragas_eval.py           — Ragas evaluation logic
-ragas_metrics.py        — Ragas metric wrappers
-scripts/run_ragas_eval.py — CLI script to run full pipeline
-ragas/corpus.yaml      — Test corpus for Ragas evaluation
-tests/ragas_eval.yaml  — Ragas test configuration
+ragas_eval.py               — Ragas evaluation logic
+ragas_metrics.py            — Ragas metric wrappers
+scripts/run_ragas_eval.py   — CLI script to run full pipeline
+scripts/compare_targets.py  — Compare scores between two targets
+ragas/corpus.yaml           — Test corpus for Ragas evaluation
+tests/test_compare_targets.py — Unit tests for comparison logic
 ```

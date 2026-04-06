@@ -1,8 +1,21 @@
 # ragprobe targets — copy to targets.yaml and fill in real values
 # Add as many targets as needed — the comparison matrix grows automatically
 targets:
-  - label: local
+  # Non-agentic baseline (ragpipe direct)
+  - label: ragpipe-v1
     url: http://localhost:8090
+    token: your-admin-token
+    model: qwen3.5
+
+  # Agentic with CRAG only (ragorchestrator)
+  - label: ragorchestrator-crag
+    url: http://localhost:8095
+    token: your-admin-token
+    model: qwen3.5
+
+  # Agentic with full loop (ragorchestrator)
+  - label: ragorchestrator-full
+    url: http://localhost:8095
     token: your-admin-token
     model: qwen3.5
 
