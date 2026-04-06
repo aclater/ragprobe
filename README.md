@@ -122,6 +122,65 @@ Custom Python assertions in `assertions/grounding.py` check ragpipe-specific fie
 - `check_is_refusal` — detects refusal markers in 12 languages
 - `check_not_refusal` — ensures non-refusal response
 
+## Ragas evaluation
+
+ragprobe includes quantitative RAG quality evaluation using [Ragas](https://github.com/explodinggradients/ragas). Ragas provides metrics beyond pass/fail adversarial tests:
+
+| Metric | What it measures |
+|--------|-----------------|
+| Faithfulness | Is the answer supported by the retrieved context? |
+| Answer relevance | Does the answer address the original question? |
+| Context precision | Of chunks retrieved, how many were useful? |
+| Context recall | Did retrieval find all needed chunks? |
+
+### How Ragas evaluation works
+
+1. Run promptfoo tests to get query/answer/context pairs
+2. Ragas evaluates each pair using a judge LLM
+3. Scores are stored in the `probe_results` table in Postgres
+4. Scores are surfaced in ragwatch and ragdeck
+
+### probe_results table
+
+```sql
+CREATE TABLE probe_results (
+    id SERIAL PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    query TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    contexts JSONB NOT NULL,
+    faithfulness FLOAT,
+    answer_relevance FLOAT,
+    context_precision FLOAT,
+    context_recall FLOAT,
+    ragas_score FLOAT,
+    evaluated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Running Ragas evaluation
+
+```bash
+# Full Ragas evaluation pipeline
+python scripts/run_ragas_eval.py
+
+# The script:
+# 1. Runs promptfoo tests (npx promptfoo eval -o results.json)
+# 2. Parses results and extracts query/answer/contexts
+# 3. Calls Ragas to compute metrics
+# 4. Stores results in probe_results table
+```
+
+### Ragas files
+
+| File | Purpose |
+|------|---------|
+| `ragas_eval.py` | Main Ragas evaluation logic |
+| `ragas_metrics.py` | Ragas metric wrappers |
+| `scripts/run_ragas_eval.py` | CLI script to run full pipeline |
+| `ragas/corpus.yaml` | Test corpus for Ragas evaluation |
+| `tests/ragas_eval.yaml` | Ragas test configuration |
+
 ## License
 
 AGPL-3.0-or-later
