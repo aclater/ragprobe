@@ -235,7 +235,7 @@ def get_latest_scores(target_label: str) -> dict:
         row = cursor.fetchone()
         conn.close()
         if row and row[0] is not None:
-            return {
+            result = {
                 "faithfulness": row[0],
                 "answer_relevance": row[1],
                 "context_precision": row[2],
@@ -243,6 +243,36 @@ def get_latest_scores(target_label: str) -> dict:
                 "n": row[4],
                 "last_run": row[5],
             }
+
+            conn2 = sqlite3.connect(SQLITE_DB)
+            route_cursor = conn2.execute(
+                """
+                SELECT
+                    routing,
+                    AVG(faithfulness) as avg_f,
+                    AVG(answer_relevance) as avg_ar,
+                    AVG(context_precision) as avg_cp,
+                    AVG(context_recall) as avg_cr,
+                    COUNT(*) as n
+                FROM probe_results
+                WHERE target = ?
+                GROUP BY routing
+                """,
+                (target_label,),
+            )
+            by_route = {}
+            for route_row in route_cursor.fetchall():
+                routing = route_row[0] or "unknown"
+                by_route[routing] = {
+                    "faithfulness": route_row[1],
+                    "answer_relevance": route_row[2],
+                    "context_precision": route_row[3],
+                    "context_recall": route_row[4],
+                    "n": route_row[5],
+                }
+            conn2.close()
+            result["by_route"] = by_route
+            return result
     return {}
 
 
@@ -277,6 +307,15 @@ def main():
             print(f"  Answer Relevance:  {scores['answer_relevance']:.3f}")
             print(f"  Context Precision: {scores['context_precision']:.3f}")
             print(f"  Context Recall:    {scores['context_recall']:.3f}")
+            by_route = scores.get("by_route", {})
+            if len(by_route) > 1:
+                print("\nPer-Route Breakdown:")
+                for route, rs in sorted(by_route.items()):
+                    print(f"  Route: {route} ({rs['n']} pairs)")
+                    print(f"    Faithfulness:      {rs['faithfulness']:.3f}")
+                    print(f"    Answer Relevance:  {rs['answer_relevance']:.3f}")
+                    print(f"    Context Precision: {rs['context_precision']:.3f}")
+                    print(f"    Context Recall:    {rs['context_recall']:.3f}")
         else:
             print(f"No stored results for {args.target}")
         sys.exit(0)
