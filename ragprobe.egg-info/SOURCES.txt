@@ -8,3 +8,4 @@ ragprobe.egg-info/entry_points.txt
 ragprobe.egg-info/requires.txt
 ragprobe.egg-info/top_level.txt
 tests/test_compare_targets.py
+tests/test_ragas_eval.py

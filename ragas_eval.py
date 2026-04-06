@@ -188,7 +188,7 @@ def run_eval(
 
 
 def print_summary(results: list[EvalResult]) -> None:
-    """Print aggregate scores."""
+    """Print aggregate and per-route scores."""
     n = len(results)
     if n == 0:
         print("No results to summarize.")
@@ -211,3 +211,23 @@ def print_summary(results: list[EvalResult]) -> None:
     print(f"  Answer Relevance:  {_fmt(avg_ar)}")
     print(f"  Context Precision: {_fmt(avg_cp)}")
     print(f"  Context Recall:    {_fmt(avg_cr)}")
+
+    by_route: dict[str, list[EvalResult]] = {}
+    for r in results:
+        route = r.routing or "unknown"
+        by_route.setdefault(route, []).append(r)
+
+    if len(by_route) > 1:
+        print("\nPer-Route Breakdown:")
+        for route, route_results in sorted(by_route.items()):
+            rn = len(route_results)
+
+            def route_avg(attr):
+                vals = [getattr(r, attr) for r in route_results if getattr(r, attr) is not None]
+                return sum(vals) / len(vals) if vals else None
+
+            print(f"  Route: {route} ({rn} pairs)")
+            print(f"    Faithfulness:      {_fmt(route_avg('faithfulness'))}")
+            print(f"    Answer Relevance:  {_fmt(route_avg('answer_relevance'))}")
+            print(f"    Context Precision: {_fmt(route_avg('context_precision'))}")
+            print(f"    Context Recall:    {_fmt(route_avg('context_recall'))}")
