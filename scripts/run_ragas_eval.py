@@ -4,16 +4,29 @@
 Run quantitative RAG quality metrics against ragpipe targets.
 
 Usage:
-    python scripts/run_ragas_eval.py
-    python scripts/run_ragas_eval.py --corpus patent_qa
+    # Against ragpipe (non-agentic baseline)
+    python scripts/run_ragas_eval.py --target-url http://localhost:8090 --target baseline --store
+
+    # Against ragorchestrator (agentic)
+    python scripts/run_ragas_eval.py --target-url http://localhost:8095 --target crag-v1 --store
+
+    # Compare two targets
+    python scripts/compare_targets.py --baseline baseline --target crag-v1
+
+    # Show latest stored scores
+    python scripts/run_ragas_eval.py --latest --target baseline
+
+    # Using targets.yaml (optional)
     python scripts/run_ragas_eval.py --store --target primary-35b
-    python scripts/run_ragas_eval.py --judge http://lennon:8080
+
+    # Custom judge model
+    python scripts/run_ragas_eval.py --target-url http://localhost:8090 --judge http://lennon:8080
 
 Environment:
     RAGPROBE_TARGET_URL     Default target URL when --target-url not given
     RAGPROBE_TARGETS_FILE   Path to targets.yaml (default: targets.yaml)
-    RAGAS_JUDGE_URL        Judge LLM URL (default: http://localhost:8080)
-    RAGAS_JUDGE_MODEL      Judge model name (default: qwen3.5)
+    RAGAS_JUDGE_URL         Judge LLM URL (default: http://localhost:8080)
+    RAGAS_JUDGE_MODEL       Judge model name (default: model.file)
     DOCSTORE_URL            Postgres URL for storing results (optional, falls back to SQLite)
 """
 
@@ -26,6 +39,10 @@ from dataclasses import asdict
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.parent
+
+# Allow running scripts without pip install -e . by adding repo root to path
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 DEFAULT_CORPUS = SCRIPT_DIR / "ragas" / "corpus.yaml"
 SQLITE_DB = SCRIPT_DIR / "ragprobe.db"
 
@@ -287,7 +304,10 @@ def main():
     else:
         targets = load_targets()
         if not targets:
-            print("Error: No targets.yaml found and no --target-url provided")
+            print("Error: No target specified. Use one of:")
+            print("  python scripts/run_ragas_eval.py --target-url http://localhost:8090 --target baseline")
+            print("  RAGPROBE_TARGET_URL=http://localhost:8090 python scripts/run_ragas_eval.py --target baseline")
+            print("  Create targets.yaml (see targets.yaml.example)")
             sys.exit(1)
 
         for tgt in targets.get("targets", []):

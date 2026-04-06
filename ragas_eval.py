@@ -170,12 +170,15 @@ def run_eval(
         )
         results.append(result)
 
+        def _fmt(v):
+            return f"{v:.2f}" if v is not None else " N/A"
+
         print(
             f"  {pair.question[:60]:<60} | "
-            f"F={scores.faithfulness:.2f if scores.faithfulness else 'N/A':>5} "
-            f"AR={scores.answer_relevance:.2f if scores.answer_relevance else 'N/A':>5} "
-            f"CP={scores.context_precision:.2f if scores.context_precision else 'N/A':>5} "
-            f"CR={scores.context_recall:.2f if scores.context_recall else 'N/A':>5}"
+            f"F={_fmt(scores.faithfulness):>5} "
+            f"AR={_fmt(scores.answer_relevance):>5} "
+            f"CP={_fmt(scores.context_precision):>5} "
+            f"CR={_fmt(scores.context_recall):>5}"
         )
 
     if store_fn:
@@ -191,21 +194,20 @@ def print_summary(results: list[EvalResult]) -> None:
         print("No results to summarize.")
         return
 
-    avg_f = sum(r.faithfulness for r in results if r.faithfulness is not None) / sum(
-        1 for r in results if r.faithfulness is not None
-    )
-    avg_ar = sum(
-        r.answer_relevance for r in results if r.answer_relevance is not None
-    ) / sum(1 for r in results if r.answer_relevance is not None)
-    avg_cp = sum(
-        r.context_precision for r in results if r.context_precision is not None
-    ) / sum(1 for r in results if r.context_precision is not None)
-    avg_cr = sum(
-        r.context_recall for r in results if r.context_recall is not None
-    ) / sum(1 for r in results if r.context_recall is not None)
+    def _avg(attr):
+        vals = [getattr(r, attr) for r in results if getattr(r, attr) is not None]
+        return sum(vals) / len(vals) if vals else None
+
+    avg_f = _avg("faithfulness")
+    avg_ar = _avg("answer_relevance")
+    avg_cp = _avg("context_precision")
+    avg_cr = _avg("context_recall")
+
+    def _fmt(v):
+        return f"{v:.3f}" if v is not None else "N/A"
 
     print(f"\nAggregate scores ({n} eval pairs):")
-    print(f"  Faithfulness:      {avg_f:.3f}")
-    print(f"  Answer Relevance:  {avg_ar:.3f}")
-    print(f"  Context Precision: {avg_cp:.3f}")
-    print(f"  Context Recall:    {avg_cr:.3f}")
+    print(f"  Faithfulness:      {_fmt(avg_f)}")
+    print(f"  Answer Relevance:  {_fmt(avg_ar)}")
+    print(f"  Context Precision: {_fmt(avg_cp)}")
+    print(f"  Context Recall:    {_fmt(avg_cr)}")
