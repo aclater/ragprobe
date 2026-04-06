@@ -87,3 +87,39 @@ Assertions should extract IDs:
 ```python
 chunk_ids = [c["id"] for c in context["providerResponse"]["metadata"]["cited_chunks"]]
 ```
+
+## Ragas evaluation
+
+ragprobe includes quantitative RAG quality evaluation using Ragas.
+Metrics are stored in the `probe_results` table in Postgres.
+
+### probe_results table
+```sql
+CREATE TABLE probe_results (
+    id SERIAL PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    query TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    contexts JSONB NOT NULL,
+    faithfulness FLOAT,
+    answer_relevance FLOAT,
+    context_precision FLOAT,
+    context_recall FLOAT,
+    ragas_score FLOAT,
+    evaluated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Running Ragas evaluation
+```bash
+python scripts/run_ragas_eval.py
+```
+
+### Key files
+```
+ragas_eval.py           — Ragas evaluation logic
+ragas_metrics.py        — Ragas metric wrappers
+scripts/run_ragas_eval.py — CLI script to run full pipeline
+ragas/corpus.yaml      — Test corpus for Ragas evaluation
+tests/ragas_eval.yaml  — Ragas test configuration
+```
