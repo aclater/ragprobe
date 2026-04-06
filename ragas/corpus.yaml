@@ -1,43 +1,57 @@
-# Ragas eval corpus for ragprobe
+# Phase 0 Ragas evaluation corpus for ragpipe quality baseline
 #
-# Each eval_pair has:
-#   question: The test question
-#   ground_truth: (optional) Ground truth answer for context_recall
-#   routing: (optional) Which semantic route should handle this
-#
-# These questions test RAG quality metrics:
-#   - Faithfulness: Does the answer use ONLY info from the context?
-#   - Answer Relevance: Does the answer address the question?
-#   - Context Precision: Were the retrieved chunks relevant?
-#   - Context Recall: Does the answer contain the ground truth? (requires ground_truth)
+# Covers all 4 semantic routes with representative queries.
+# ground_truth enables context_recall measurement where possible.
+# This corpus is the benchmark for all agentic RAG improvements.
 
 eval_pairs:
-  - question: "What does the patent manual say about prior art?"
+  # ── Personnel route (should hit personnel collection, grounding=corpus) ──
+  - question: "What is Adam Clater's current job title?"
+    ground_truth: "Chief Architect in the Red Hat CTO Organization"
+    routing: personnel
+
+  - question: "Who does Adam Clater work for and how long has he been there?"
+    ground_truth: "Red Hat since December 2010"
+    routing: personnel
+
+  - question: "Describe Adam Clater's professional background"
+    routing: personnel
+
+  # ── Analysis route (should hit nato collection, grounding=corpus) ────────
+  - question: "What are the key trends in NATO AI adoption strategy?"
+    routing: analysis
+
+  - question: "Summarize the NATO capability targets analysis"
+    routing: analysis
+
+  - question: "What does the defense authorization act say about AI procurement?"
+    routing: analysis
+
+  # ── Lookup route (should hit mpep collection, grounding=corpus) ──────────
+  - question: "What does the MPEP say about prior art requirements?"
     routing: lookup
 
-  - question: "Find the relevant patent law provisions for this invention"
+  - question: "What section of the patent manual covers patent eligibility under 35 USC 101?"
     routing: lookup
 
-  - question: "What are the requirements for a valid patent claim?"
+  - question: "What are the MPEP requirements for a valid patent claim?"
     routing: lookup
 
-  - question: "What section covers patent eligibility under 35 USC 101?"
-    routing: lookup
+  # ── General route (no RAG, grounding=general) ───────────────────────────
+  - question: "What is the capital of France?"
+    ground_truth: "Paris"
+    routing: general
 
-  - question: "Explain the requirements for establishing prior art under MPEP guidelines"
-    routing: lookup
+  - question: "Explain how TCP/IP works"
+    routing: general
 
-  - question: "What is the statute of limitations for filing a patent infringement suit?"
-    routing: lookup
+  # ── Edge cases ──────────────────────────────────────────────────────────
+  - question: "Compare Adam Clater's experience with the NATO AI strategy"
+    routing: personnel
 
-  - question: "What are the differences between design patents and utility patents?"
-    routing: lookup
+  - question: "What is the meaning of life?"
+    ground_truth: "This is a philosophical question with no single definitive answer"
+    routing: general
 
-  - question: "Describe the patent examination process from filing to issuance"
-    routing: lookup
-
-  - question: "How do I file a provisional patent application?"
-    routing: lookup
-
-  - question: "What constitutes patentable subject matter under the law?"
+  - question: "Tell me about the patent requirements for AI systems in defense"
     routing: lookup

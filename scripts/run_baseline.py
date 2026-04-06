@@ -408,7 +408,7 @@ def main():
     parser = argparse.ArgumentParser(description="Phase 0 baseline evaluation")
     parser.add_argument(
         "--corpus", type=Path,
-        default=SCRIPT_DIR / "tests" / "ragas_eval.yaml",
+        default=SCRIPT_DIR / "ragas" / "corpus.yaml",
     )
     parser.add_argument(
         "--dry-run", action="store_true",
