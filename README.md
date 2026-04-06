@@ -30,6 +30,7 @@ Adversarial testing and autonomous prompt tuning agent for [ragpipe](https://git
 git clone https://github.com/aclater/ragprobe
 cd ragprobe
 npm install
+pip install -e .
 
 # Configure targets
 cp targets.yaml.example targets.yaml
@@ -161,7 +162,7 @@ CREATE TABLE probe_results (
 ### Running Ragas evaluation
 
 ```bash
-# Full Ragas evaluation pipeline
+# Full Ragas evaluation pipeline (requires pip install -e .)
 python scripts/run_ragas_eval.py
 
 # The script:
