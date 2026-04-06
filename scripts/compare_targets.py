@@ -29,6 +29,10 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).parent.parent
 SQLITE_DB = SCRIPT_DIR / "ragprobe.db"
 
+# Allow running scripts without pip install -e .
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
 METRICS = ["faithfulness", "answer_relevance", "context_precision", "context_recall"]
 
 
