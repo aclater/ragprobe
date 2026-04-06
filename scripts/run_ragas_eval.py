@@ -10,6 +10,7 @@ Usage:
     python scripts/run_ragas_eval.py --judge http://lennon:8080
 
 Environment:
+    RAGPROBE_TARGET_URL     Default target URL when --target-url not given
     RAGPROBE_TARGETS_FILE   Path to targets.yaml (default: targets.yaml)
     RAGAS_JUDGE_URL        Judge LLM URL (default: http://localhost:8080)
     RAGAS_JUDGE_MODEL      Judge model name (default: qwen3.5)
@@ -271,10 +272,12 @@ def main():
         "model": args.judge_model or os.environ.get("RAGAS_JUDGE_MODEL", "qwen3.5"),
     }
 
-    if args.target_url:
+    target_url = args.target_url or os.environ.get("RAGPROBE_TARGET_URL")
+
+    if target_url:
         token = args.token or os.environ.get("RAGPIPE_ADMIN_TOKEN", "")
         run_single_target(
-            target_url=args.target_url,
+            target_url=target_url,
             token=token,
             corpus=corpus,
             judge_config=judge_config,

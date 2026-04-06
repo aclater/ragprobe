@@ -85,6 +85,43 @@ jobs:
           sys.exit(1 if errors else 0)
           "
 
+  validate-ragas-scripts:
+    name: Validate Ragas scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Syntax check Ragas scripts
+        run: |
+          python -m py_compile scripts/run_ragas_eval.py
+          python -m py_compile scripts/compare_targets.py
+          python -m py_compile scripts/run_baseline.py
+          python -m py_compile ragas_eval.py
+          python -m py_compile ragas_metrics.py
+      - name: Verify compare_targets CLI loads
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, 'scripts')
+          from compare_targets import query_target, print_comparison, TargetScores, METRICS
+          print(f'Metrics: {METRICS}')
+          print('compare_targets module loads correctly')
+          "
+
+  test-compare-targets:
+    name: Test compare_targets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - run: pip install --quiet pytest pyyaml
+      - name: Run compare_targets unit tests
+        run: pytest tests/test_compare_targets.py -v
+
   lint-shell:
     name: ShellCheck
     runs-on: ubuntu-latest

@@ -8,3 +8,4 @@ history.json
 !package.json
 !promptfooconfig.js
 __pycache__/
+ragprobe.db
