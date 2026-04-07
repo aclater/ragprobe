@@ -20,6 +20,11 @@ dev = [
     "shellcheck-py>=0.9.0",
 ]
 
+[tool.pytest.ini_options]
+markers = [
+    "live: tests that hit live services (skip unless --live flag is passed)",
+]
+
 [project.scripts]
 ragprobe-agent = "agent:main"
 
