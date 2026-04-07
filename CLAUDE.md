@@ -26,6 +26,8 @@ prompts/system-prompt.txt   — current best prompt (committed)
 targets.yaml                — gitignored, real URLs + tokens + agent config
 history.json                — gitignored, iteration history for learning
 tests/*.yaml                — 13 test files, 66 adversarial tests
+scripts/smoke-test.sh        — stack verification in under 60 seconds
+scripts/smoke_test.py        — legacy service health checker
 scripts/reload-and-eval.sh  — manual reload + eval
 ```
 
