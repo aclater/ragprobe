@@ -39,10 +39,6 @@ from dataclasses import asdict
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.parent
-
-# Allow running scripts without pip install -e . by adding repo root to path
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
 DEFAULT_CORPUS = SCRIPT_DIR / "ragas" / "corpus.yaml"
 SQLITE_DB = SCRIPT_DIR / "ragprobe.db"
 
