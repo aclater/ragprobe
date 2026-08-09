@@ -10,7 +10,7 @@
     "reload-eval": "bash scripts/reload-and-eval.sh"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^5.2.3",
     "promptfoo": "^0.121.3"
   }
 }
