@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
-    "promptfoo": "^0.121.3"
+    "promptfoo": "^0.122.0"
   }
 }
